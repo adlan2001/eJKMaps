@@ -4,4 +4,4 @@ eJKMaps is a system that I developed during my time as an intern in [Jurukur Kho
 
 ![System interface](img/Screenshot%20(18).png)
 
-Click [here](https://ejkmaps.jurukurkhoomas.ceom.my) to visit the system website.
+Click [here](https://ejkmaps.jurukurkhoomas.com.my) to visit the system website.
