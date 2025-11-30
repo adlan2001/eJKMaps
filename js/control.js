@@ -5,18 +5,10 @@ var basemapOpt = [
 		value: 'osm'
 	},
 	{
-		label: 'Satellite',
+		label: 'Google Satellite',
 		value: 'gmaps'
 	},
 	// Add more basemap options as needed
-];
-
-var prjInfoOpt = [
-	{label:'Engineering',value:'eng'},
-	{label:'Hydrography',value:'hydro'},
-	{label:'UAV Mapping',value:'uav'},
-	{label:'UUD Mapping',value:'uud'},
-	{label:'Land Title',value:'title'}
 ];
 
 // Function to create basemap radio buttons
@@ -40,23 +32,8 @@ function createBasemapRadios() {
 	}
 }
 
-// Function to create details checkboxes
-function detailsChbx(){
-	var detailsDiv = document.getElementById('detailsOpt');
-
-	prjInfoOpt.forEach(function (option){
-		var detailsLabel = document.createElement('label');
-		detailsLabel.classList.add('dropdown-item');
-
-		detailsLabel.innerHTML = `<input type="checkbox" class="sub-checkbox" onclick=toggle${option.value}() unchecked>
-		<span><img src="legend/prjInfo/${option.value}.png" class="mx-1">${option.label}</span>`;
-		detailsDiv.appendChild(detailsLabel);
-	});
-}
-
 // Call the function to create basemap radios and utilities checkboxes
 createBasemapRadios();
-detailsChbx();
 
 function changeBmap(basemap) {
 	if (basemap === 'osm') {
@@ -81,3 +58,90 @@ mapContainer.style.height = `calc(100vh - ${navbarHeight}px)`;
 //Set the space for navbar to avoid map element from positioning behind the navbar
 const navbarContainer = document.getElementById("navbarDiv");
 navbarContainer.style.height = `${navbarHeight}px`;
+
+let geojsonLayer = null; // We need this variable accessible globally
+
+// Function to update the map based on selected company
+function updateMap(selectedCompany, rawData) {
+    // 1. Clear existing Polygons AND Markers
+    if (geojsonLayer) map.removeLayer(geojsonLayer);
+    markerLayerGroup.clearLayers(); // <--- Important: Clear old pins
+
+    // 2. Draw Polygons
+    geojsonLayer = L.geoJSON(rawData, {
+        style: styleFeature,
+        filter: function(feature) {
+            if (selectedCompany === 'All') return true;
+            return feature.properties.SYARIKAT === selectedCompany;
+        },
+        onEachFeature: function(feature, layer) {
+            // A. Bind the standard click popup to the polygon
+            bindPopupContent(feature, layer);
+
+            // B. Create the Center Marker + Label
+            const centerMarker = createCenterMarker(feature, layer, map);
+            
+            // C. Add the marker to our specific group
+            markerLayerGroup.addLayer(centerMarker);
+        }
+    }).addTo(map);
+
+    // 3. Zoom logic
+    if (geojsonLayer.getLayers().length > 0) {
+        map.fitBounds(geojsonLayer.getBounds());
+    }
+}
+
+// Add a new global variable for the markers
+let markerLayerGroup = L.layerGroup().addTo(map);
+
+// --- js/control.js ---
+
+let legendControl = null; // Store globally so we can remove it if needed
+
+function updateLegend(mapInstance, data) {
+	// 1. If a legend already exists, remove it (to avoid duplicates)
+	if (legendControl) {
+			mapInstance.removeControl(legendControl);
+	}
+
+	legendControl = L.control({ position: 'bottomright' });
+
+	legendControl.onAdd = function (map) {
+		const div = L.DomUtil.create('div', 'info legend');
+		
+		// 2. Find Unique Companies
+		const uniqueCompanies = new Set();
+		data.features.forEach(f => {
+			if (f.properties.SYARIKAT) {
+				uniqueCompanies.add(f.properties.SYARIKAT);
+			}
+		});
+
+		// 3. Convert Set to Array and Sort Alphabetically
+		const sortedCompanies = Array.from(uniqueCompanies).sort();
+
+		div.innerHTML += '<h4>Companies</h4>';
+		
+		// 4. Container for the list (for scrolling if needed)
+		div.innerHTML += '<div class="legend-list">';
+
+		// 5. Generate HTML
+		sortedCompanies.forEach(company => {
+			// CRITICAL: Call the same function from layer.js
+			const color = stringToColor(company); 
+
+			div.innerHTML += 
+				`<div>
+					<i style="background:${color}"></i> 
+					<span>${company}</span>
+				</div>`;
+		});
+
+		div.innerHTML += '</div>'; // Close list container
+
+		return div;
+	};
+
+	legendControl.addTo(mapInstance);
+}

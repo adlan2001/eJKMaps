@@ -32,6 +32,103 @@ html, body {
 	padding: 0.5rem 0rem !important
 }
 
-/*.dropdown-divider{
-	margin: 0 0 !important
-}*/
+/* --- State 1: Zoom <= 15 (Show Pin + Shadow, Hide Label) --- */
+.map-zoom-out .custom-label {
+	display: none;
+}
+.map-zoom-out .leaflet-marker-icon,
+.map-zoom-out .leaflet-marker-shadow {
+	display: block; /* Show Pin and Shadow */
+}
+
+/* --- State 2: Zoom >= 16 (Hide Pin + Shadow, Show Label) --- */
+.map-zoom-in .leaflet-marker-icon, 
+.map-zoom-in .leaflet-marker-shadow {
+	display: none; /* Hide Pin AND Shadow */
+}
+
+.map-zoom-in .custom-label {
+	display: block;
+	
+	/* Make the box transparent so it looks like floating text */
+	background: transparent;
+	border: none;
+	box-shadow: none;
+
+	/* Text Styling */
+	color: #000; /* Black text */
+	font-weight: bold;
+	font-size: 12px;
+	text-shadow: 2px 2px 0px white, -2px -2px 0px white, 2px -2px 0px white, -2px 2px 0px white; /* Strong white outline */
+	
+	/* CRITICAL: Center alignment */
+	text-align: center;
+	white-space: nowrap; /* Prevent text breaking into two lines */
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/* Remove the little "triangle" pointer from the tooltip */
+.custom-label::before {
+	display: none;
+}
+
+.legend {
+	background: white;
+	padding: 10px;
+	border-radius: 5px;
+	box-shadow: 0 0 15px rgba(0,0,0,0.2);
+	line-height: 18px;
+	color: #555;
+	
+	/* Constraint: Don't let it get taller than 300px */
+	max-height: 300px;
+	width: 200px; /* Fixed width looks neater */
+	display: flex;
+	flex-direction: column;
+}
+
+.legend h4 {
+	margin: 0 0 10px;
+}
+
+/* Make the list part scrollable */
+.legend-list {
+	overflow-y: auto; /* Scroll bar only if needed */
+	flex-grow: 1;
+}
+
+/* Individual Item Styling */
+.legend div div {
+	display: flex;
+	align-items: center;
+	margin-bottom: 4px;
+}
+
+.legend i {
+	width: 18px;
+	height: 18px;
+	flex-shrink: 0; /* Stop the color box from squishing */
+	margin-right: 8px;
+	opacity: 0.7;
+}
+
+.color-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%; /* Make it circular (optional) */
+    margin-right: 10px;
+    border: 1px solid rgba(0,0,0,0.2);
+}
+
+/* Optional: Make the dropdown items look nicer */
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px 20px;
+}
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
