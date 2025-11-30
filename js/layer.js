@@ -19,11 +19,11 @@ function stringToColor(str) {
 // Main Style Function
 function styleFeature(feature) {
   return {
-    fillColor: stringToColor(feature.properties.SYARIKAT),
-    weight: 2,
-    opacity: 1,
-    color: 'white',
-    fillOpacity: 0.7
+      fillColor: stringToColor(feature.properties.SYARIKAT),
+      weight: 2,
+      opacity: 1,
+      color: 'white',
+      fillOpacity: 0.7
   };
 }
 

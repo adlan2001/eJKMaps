@@ -100,48 +100,48 @@ let markerLayerGroup = L.layerGroup().addTo(map);
 let legendControl = null; // Store globally so we can remove it if needed
 
 function updateLegend(mapInstance, data) {
-	// 1. If a legend already exists, remove it (to avoid duplicates)
-	if (legendControl) {
-			mapInstance.removeControl(legendControl);
-	}
+    // 1. If a legend already exists, remove it (to avoid duplicates)
+    if (legendControl) {
+        mapInstance.removeControl(legendControl);
+    }
 
-	legendControl = L.control({ position: 'bottomright' });
+    legendControl = L.control({ position: 'bottomright' });
 
-	legendControl.onAdd = function (map) {
-		const div = L.DomUtil.create('div', 'info legend');
-		
-		// 2. Find Unique Companies
-		const uniqueCompanies = new Set();
-		data.features.forEach(f => {
-			if (f.properties.SYARIKAT) {
-				uniqueCompanies.add(f.properties.SYARIKAT);
-			}
-		});
+    legendControl.onAdd = function (map) {
+        const div = L.DomUtil.create('div', 'info legend');
+        
+        // 2. Find Unique Companies
+        const uniqueCompanies = new Set();
+        data.features.forEach(f => {
+            if (f.properties.SYARIKAT) {
+                uniqueCompanies.add(f.properties.SYARIKAT);
+            }
+        });
 
-		// 3. Convert Set to Array and Sort Alphabetically
-		const sortedCompanies = Array.from(uniqueCompanies).sort();
+        // 3. Convert Set to Array and Sort Alphabetically
+        const sortedCompanies = Array.from(uniqueCompanies).sort();
 
-		div.innerHTML += '<h4>Companies</h4>';
-		
-		// 4. Container for the list (for scrolling if needed)
-		div.innerHTML += '<div class="legend-list">';
+        div.innerHTML += '<h4>Companies</h4>';
+        
+        // 4. Container for the list (for scrolling if needed)
+        div.innerHTML += '<div class="legend-list">';
 
-		// 5. Generate HTML
-		sortedCompanies.forEach(company => {
-			// CRITICAL: Call the same function from layer.js
-			const color = stringToColor(company); 
+        // 5. Generate HTML
+        sortedCompanies.forEach(company => {
+            // CRITICAL: Call the same function from layer.js
+            const color = stringToColor(company); 
 
-			div.innerHTML += 
-				`<div>
-					<i style="background:${color}"></i> 
-					<span>${company}</span>
-				</div>`;
-		});
+            div.innerHTML += 
+                `<div>
+                    <i style="background:${color};"></i> 
+                    <span>${company}</span>
+                </div>`;
+        });
 
-		div.innerHTML += '</div>'; // Close list container
+        div.innerHTML += '</div>'; // Close list container
 
-		return div;
-	};
+        return div;
+    };
 
-	legendControl.addTo(mapInstance);
+    legendControl.addTo(mapInstance);
 }
