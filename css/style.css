@@ -73,43 +73,6 @@ html, body {
 	display: none;
 }
 
-.legend {
-	background: white;
-	padding: 10px;
-	border-radius: 5px;
-	box-shadow: 0 0 15px rgba(0,0,0,0.2);
-	line-height: 18px;
-	color: #555;
-	
-	/* Constraint: Don't let it get taller than 300px */
-	max-height: 300px;
-	width: 200px; /* Fixed width looks neater */
-	display: flex;
-	flex-direction: column;
+.td-gap {
+	width: 10px;
 }
-
-.legend h4 {
-	margin: 0 0 10px;
-}
-
-/* Make the list part scrollable */
-.legend-list {
-	overflow-y: auto; /* Scroll bar only if needed */
-	flex-grow: 1;
-}
-
-/* Individual Item Styling */
-.legend div div {
-	display: flex;
-	align-items: center;
-	margin-bottom: 4px;
-}
-
-.legend i {
-	width: 18px;
-	height: 18px;
-	flex-shrink: 0; /* Stop the color box from squishing */
-	margin-right: 8px;
-	opacity: 0.7;
-}
-
