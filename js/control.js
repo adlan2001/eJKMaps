@@ -90,77 +90,51 @@ function updateMap(selectedCompany, rawData) {
     if (geojsonLayer.getLayers().length > 0) {
         map.fitBounds(geojsonLayer.getBounds());
     }
+
+	// --- Create / Wire Leaflet Search control here (search by LOT) ---
+	if (typeof L !== 'undefined' && L.Control && L.Control.Search) {
+		// If the control doesn't exist yet, create it and attach to the map
+		if (!window.searchControl) {
+			window.searchControl = new L.Control.Search({
+				position: 'topleft',
+				layer: geojsonLayer,
+				propertyName: 'LOT',
+				marker: false,
+				initial: false,
+				collapsed: true,
+				textPlaceholder: 'Search LOT...',
+				moveToLocation: function(latlng, title, map) {
+					// Handle polygon and point results
+					if (latlng && latlng.layer && latlng.layer.getBounds) {
+						map.fitBounds(latlng.layer.getBounds());
+					} else if (latlng && latlng.getBounds) {
+						map.fitBounds(latlng.getBounds());
+					} else if (latlng && latlng.lat) {
+						map.setView(latlng, 17);
+					} else {
+						map.setView(latlng, 17);
+					}
+				}
+			});
+			map.addControl(window.searchControl);
+
+			// Open the feature popup when a location is found
+			window.searchControl.on('search:locationfound', function(e) {
+				if (e && e.layer && e.layer.openPopup) {
+					e.layer.openPopup();
+				}
+			});
+		} else {
+			// If control already exists (subsequent updates), set the new layer
+			try {
+				window.searchControl.setLayer(geojsonLayer);
+			} catch (err) {
+				// Some versions of the plugin may use a different API; ignore if not available
+				console.warn('Search control setLayer failed', err);
+			}
+		}
+	}
 }
 
 // Add a new global variable for the markers
 let markerLayerGroup = L.layerGroup().addTo(map);
-
-// --- js/control.js ---
-
-let legendControl = null; // Store globally so we can remove it if needed
-
-function updateLegend(mapInstance, data) {
-    // 1. If a legend already exists, remove it (to avoid duplicates)
-    if (legendControl) {
-        mapInstance.removeControl(legendControl);
-    }
-
-    legendControl = L.control({ position: 'bottomright' });
-
-    legendControl.onAdd = function (map) {
-        const div = L.DomUtil.create('div', 'info legend');
-        
-        // 2. Find Unique Companies
-        const uniqueCompanies = new Set();
-        data.features.forEach(f => {
-            if (f.properties.SYARIKAT) {
-                uniqueCompanies.add(f.properties.SYARIKAT);
-            }
-        });
-
-        // 3. Convert Set to Array and Sort Alphabetically
-        const sortedCompanies = Array.from(uniqueCompanies).sort();
-
-        div.innerHTML += '<h4>Companies</h4>';
-								// 5. Generate HTML (safer DOM approach + guard for missing stringToColor)
-								sortedCompanies.forEach(company => {
-										const color = stringToColor(company);
-				
-										const item = document.createElement('div');
-				
-										const swatch = document.createElement('i');
-										swatch.style.background = color;
-										swatch.style.display = 'inline-block';
-										swatch.style.width = '12px';
-										swatch.style.height = '12px';
-										swatch.style.marginRight = '6px';
-				
-										const label = document.createElement('span');
-										label.textContent = company; // prevents HTML injection
-				
-										item.appendChild(swatch);
-										item.appendChild(label);
-										div.appendChild(item);
-								});
-				// ...existing code...
-
-        return div;
-    };
-
-    legendControl.addTo(mapInstance);
-}
-
-// Add a deterministic string -> hex color helper
-function stringToColor(str) {
-	// simple hash to color
-	let hash = 0;
-	for (let i = 0; i < str.length; i++) {
-		hash = str.charCodeAt(i) + ((hash << 5) - hash);
-	}
-	let color = '#';
-	for (let i = 0; i < 3; i++) {
-		const value = (hash >> (i * 8)) & 0xFF;
-		color += ('00' + value.toString(16)).slice(-2);
-	}
-	return color;
-}

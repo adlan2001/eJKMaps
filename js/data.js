@@ -23,7 +23,7 @@ fetch('data/boonsiew.geojson')
             const color = (typeof stringToColor === 'function') ? stringToColor(company) : '#000000';
 
             // prepend a colored square character and set option text color
-            option.textContent = `▮ ${company}`;
+            option.textContent = `■ ${company}`;
             option.dataset.color = color;
             option.style.color = color;
 

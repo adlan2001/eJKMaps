@@ -1,12 +1,12 @@
 //OpenStreetMap Standard Basemap
 var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-	maxZoom: 24, // Max-zoom is 19
+	maxZoom: 22, // Max-zoom is 19
 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright"> OpenStreetMap</a>'
 });
 
 //Google Maps Satellite Basemap
 var gmaps = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
-	maxZoom: 24, // Max-zoom is 22
+	maxZoom: 22, // Max-zoom is 22
 	subdomains:["mt0","mt1","mt2","mt3"],
 	attribution: '&copy; <a href="https://www.google.com/maps/"> Google Maps</a>'
 });
@@ -20,7 +20,7 @@ var penangBounds = L.latLngBounds(
 //Initialize the map
 var map = L.map('map', {
 		zoomControl:true,
-		maxZoom:24,
+		maxZoom:22,
 		minZoom:1,
 		layers: [osm]
 }).fitBounds(penangBounds);
