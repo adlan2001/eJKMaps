@@ -1,65 +1,52 @@
-// Define an array of basemap options
-var basemapOpt = [
-	{
-		label: 'OpenStreetMap',
-		value: 'osm'
-	},
-	{
-		label: 'Google Satellite',
-		value: 'gmaps'
-	},
-	// Add more basemap options as needed
+
+// Basemap options: simple array so it's easy to add more
+const basemapOpt = [
+	{ label: 'OpenStreetMap', value: 'osm' },
+	{ label: 'Google Satellite', value: 'gmaps' }
 ];
 
-// Function to create basemap radio buttons
+/**
+ * Create basemap radio buttons inside the dropdown.
+ * Kept as a standalone function so it's easy to test/replace.
+ */
 function createBasemapRadios() {
-	var basemapDiv = document.getElementById('basemapOpt');
+	const basemapDiv = document.getElementById('basemapOpt');
+	if (!basemapDiv) return;
 
-	basemapOpt.forEach(function (option) {
-		var radioLabel = document.createElement('label');
+	basemapOpt.forEach(option => {
+		const radioLabel = document.createElement('label');
 		radioLabel.classList.add('dropdown-item');
-		
-		radioLabel.innerHTML = `<input type="radio" name="basemap" value="${option.value}" onclick="changeBmap('${option.value}')" />
-		<span class="ms-1"> ${option.label}</span>`;
+
+		radioLabel.innerHTML = `
+			<input type="radio" name="basemap" value="${option.value}" onclick="changeBmap('${option.value}')" />
+			<span class="ms-1"> ${option.label}</span>`;
+
 		basemapDiv.appendChild(radioLabel);
 	});
 
 	// Set the first basemap as checked by default
-	var defaultBasemap = basemapOpt[0].value;
-	var defaultRadio = basemapDiv.querySelector(`input[value="${defaultBasemap}"]`);
-	if (defaultRadio) {
-		defaultRadio.checked = true;
-	}
+	const defaultBasemap = basemapOpt[0] && basemapOpt[0].value;
+	const defaultRadio = basemapDiv.querySelector(`input[value="${defaultBasemap}"]`);
+	if (defaultRadio) defaultRadio.checked = true;
 }
 
-// Call the function to create basemap radios and utilities checkboxes
-createBasemapRadios();
-
+/**
+ * Switch the visible basemap. This uses the two global layer variables
+ * that are defined in `map.js` (`osm`, `gmaps`).
+ * @param {string} basemap - 'osm' or 'gmaps'
+ */
 function changeBmap(basemap) {
 	if (basemap === 'osm') {
-			map.removeLayer(gmaps);
-			osm.addTo(map);
+		if (typeof gmaps !== 'undefined' && map.hasLayer(gmaps)) map.removeLayer(gmaps);
+		if (typeof osm !== 'undefined') osm.addTo(map);
 	} else if (basemap === 'gmaps') {
-			map.removeLayer(osm);
-			gmaps.addTo(map);
+		if (typeof osm !== 'undefined' && map.hasLayer(osm)) map.removeLayer(osm);
+		if (typeof gmaps !== 'undefined') gmaps.addTo(map);
 	}
 }
 
-// Get the navbar element using its ID
-var navbar = document.getElementById('my-navbar');
-
-// Calculate the height of the navbar
-var navbarHeight = navbar.offsetHeight;
-
-// Set the map container's height by subtracting the navbar height from the available view height
-const mapContainer = document.getElementById("map");
-mapContainer.style.height = `calc(100vh - ${navbarHeight}px)`;
-
-//Set the space for navbar to avoid map element from positioning behind the navbar
-const navbarContainer = document.getElementById("navbarDiv");
-navbarContainer.style.height = `${navbarHeight}px`;
-
-let geojsonLayer = null; // We need this variable accessible globally
+// Global layer reference for polygons (kept global so other modules can update)
+let geojsonLayer = null;
 
 // Function to update the map based on selected company
 function updateMap(selectedCompany, rawData) {
@@ -138,3 +125,19 @@ function updateMap(selectedCompany, rawData) {
 
 // Add a new global variable for the markers
 let markerLayerGroup = L.layerGroup().addTo(map);
+
+// Initialize DOM-dependent controls when the page is ready. This keeps
+// initialization in one place and helps new developers find startup logic.
+document.addEventListener('DOMContentLoaded', () => {
+	createBasemapRadios();
+
+	// Calculate navbar height and size the map accordingly
+	const navbar = document.getElementById('my-navbar');
+	const navbarHeight = navbar ? navbar.offsetHeight : 0;
+
+	const mapContainer = document.getElementById('map');
+	if (mapContainer) mapContainer.style.height = `calc(100vh - ${navbarHeight}px)`;
+
+	const navbarContainer = document.getElementById('navbarDiv');
+	if (navbarContainer) navbarContainer.style.height = `${navbarHeight}px`;
+});

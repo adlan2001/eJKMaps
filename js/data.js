@@ -1,19 +1,37 @@
-let rawData = null; // Store data globally
+/*
+ * Load GeoJSON data, populate the company dropdown, and initialize the map.
+ * Converted to async/await for clearer control flow which is easier
+ * for beginners to reason about.
+ */
+let rawData = null; // Store data globally for other modules
 
-fetch('data/boonsiew.geojson')
-    .then(response => response.json())
-    .then(data => {
+async function loadGeoJsonAndInit() {
+    try {
+        const resp = await fetch('data/boonsiew.geojson');
+        if (!resp.ok) throw new Error(`HTTP ${resp.status} ${resp.statusText}`);
+        const data = await resp.json();
         rawData = data;
 
-        // 1. Setup the Dropdown (Fill the options)
+        // 1. Setup the Dropdown (fill the options)
         const select = document.getElementById('companyFilter');
+        if (!select) return;
 
         // collect unique, non-empty company names and sort
         const uniqueCompanies = Array.from(new Set(
-            data.features
+            (data.features || [])
                 .map(f => f.properties && f.properties.SYARIKAT)
                 .filter(Boolean)
         )).sort();
+
+        // Add a default option for 'All' at the top
+        // (index.html already includes 'All' but this keeps behaviour robust)
+        // Ensure we don't duplicate an existing 'All' option
+        if (!Array.from(select.options).some(o => o.value === 'All')) {
+            const defaultOpt = document.createElement('option');
+            defaultOpt.value = 'All';
+            defaultOpt.textContent = 'All Companies';
+            select.appendChild(defaultOpt);
+        }
 
         uniqueCompanies.forEach(company => {
             const option = document.createElement('option');
@@ -31,7 +49,7 @@ fetch('data/boonsiew.geojson')
         });
 
         // 2. Add Event Listener
-        select.addEventListener('change', function(e) {
+        select.addEventListener('change', function (e) {
             // Call the function defined in control.js
             updateMap(e.target.value, rawData);
         });
@@ -40,6 +58,12 @@ fetch('data/boonsiew.geojson')
         select.value = 'All';
         updateMap('All', rawData);
 
-        // removed updateLegend(map, rawData); -- colors are shown in the select now
-    })
-    .catch(err => console.error("Error:", err));
+    } catch (err) {
+        console.error('Failed to load GeoJSON:', err);
+    }
+}
+
+// Start the data load when DOMContentLoaded so select exists
+document.addEventListener('DOMContentLoaded', () => {
+    loadGeoJsonAndInit();
+});

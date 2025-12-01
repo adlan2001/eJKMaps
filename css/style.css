@@ -72,7 +72,3 @@ html, body {
 .custom-label::before {
 	display: none;
 }
-
-.td-gap {
-	width: 10px;
-}
