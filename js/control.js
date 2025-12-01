@@ -122,26 +122,45 @@ function updateLegend(mapInstance, data) {
         const sortedCompanies = Array.from(uniqueCompanies).sort();
 
         div.innerHTML += '<h4>Companies</h4>';
-        
-        // 4. Container for the list (for scrolling if needed)
-        div.innerHTML += '<div class="legend-list">';
-
-        // 5. Generate HTML
-        sortedCompanies.forEach(company => {
-            // CRITICAL: Call the same function from layer.js
-            const color = stringToColor(company); 
-
-            div.innerHTML += 
-                `<div>
-                    <i style="background:${color};"></i> 
-                    <span>${company}</span>
-                </div>`;
-        });
-
-        div.innerHTML += '</div>'; // Close list container
+								// 5. Generate HTML (safer DOM approach + guard for missing stringToColor)
+								sortedCompanies.forEach(company => {
+										const color = stringToColor(company);
+				
+										const item = document.createElement('div');
+				
+										const swatch = document.createElement('i');
+										swatch.style.background = color;
+										swatch.style.display = 'inline-block';
+										swatch.style.width = '12px';
+										swatch.style.height = '12px';
+										swatch.style.marginRight = '6px';
+				
+										const label = document.createElement('span');
+										label.textContent = company; // prevents HTML injection
+				
+										item.appendChild(swatch);
+										item.appendChild(label);
+										div.appendChild(item);
+								});
+				// ...existing code...
 
         return div;
     };
 
     legendControl.addTo(mapInstance);
+}
+
+// Add a deterministic string -> hex color helper
+function stringToColor(str) {
+	// simple hash to color
+	let hash = 0;
+	for (let i = 0; i < str.length; i++) {
+		hash = str.charCodeAt(i) + ((hash << 5) - hash);
+	}
+	let color = '#';
+	for (let i = 0; i < 3; i++) {
+		const value = (hash >> (i * 8)) & 0xFF;
+		color += ('00' + value.toString(16)).slice(-2);
+	}
+	return color;
 }
