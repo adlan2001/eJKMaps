@@ -75,7 +75,7 @@ function updateMap(selectedCompany, rawData) {
 
     // 3. Zoom logic
     if (geojsonLayer.getLayers().length > 0) {
-        map.fitBounds(geojsonLayer.getBounds());
+        map.flyToBounds(geojsonLayer.getBounds(), { duration: 1.75 });
     }
 
 	// --- Create / Wire Leaflet Search control here (search by LOT) ---
@@ -93,9 +93,9 @@ function updateMap(selectedCompany, rawData) {
 				moveToLocation: function(latlng, title, map) {
 					// Handle polygon and point results
 					if (latlng && latlng.layer && latlng.layer.getBounds) {
-						map.fitBounds(latlng.layer.getBounds());
+						map.flyToBounds(latlng.layer.getBounds(), { duration: 1.75 });
 					} else if (latlng && latlng.getBounds) {
-						map.fitBounds(latlng.getBounds());
+						map.flyToBounds(latlng.getBounds(), { duration: 1.75 });
 					} else if (latlng && latlng.lat) {
 						map.setView(latlng, 17);
 					} else {
