@@ -79,3 +79,9 @@ function updateZoomClass() {
 // class is set for initial render.
 map.on('zoomend', updateZoomClass);
 updateZoomClass();
+
+L.easyPrint({
+		title: 'Print map',
+		position: 'topleft',
+		sizeModes: ['Current','A4Portrait', 'A4Landscape'],
+}).addTo(map);
