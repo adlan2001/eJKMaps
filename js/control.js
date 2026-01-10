@@ -28,6 +28,14 @@ function createBasemapRadios() {
 	const defaultBasemap = basemapOpt[0] && basemapOpt[0].value;
 	const defaultRadio = basemapDiv.querySelector(`input[value="${defaultBasemap}"]`);
 	if (defaultRadio) defaultRadio.checked = true;
+
+	// Add NDCDB lot overlay control
+	const ndcdbLabel = document.createElement('label');
+	ndcdbLabel.classList.add('dropdown-item');
+	ndcdbLabel.innerHTML = `
+		<input type="checkbox" id="ndcdbToggle" onclick="toggleNDCDBOverlay()" />
+		<span class="ms-1"> Lot NDCDB</span>`;
+	basemapDiv.appendChild(ndcdbLabel);
 }
 
 /**
@@ -42,6 +50,18 @@ function changeBmap(basemap) {
 	} else if (basemap === 'gmaps') {
 		if (typeof osm !== 'undefined' && map.hasLayer(osm)) map.removeLayer(osm);
 		if (typeof gmaps !== 'undefined') gmaps.addTo(map);
+	}
+}
+
+function toggleNDCDBOverlay() {
+	const checkbox = document.getElementById('ndcdbToggle');
+	if (!checkbox || typeof ndcdbOverlay === 'undefined') map.removeLayer(ndcdbOverlay)
+	else {
+		if (checkbox.checked) {
+			ndcdbOverlay.addTo(map);
+		} else {
+			map.removeLayer(ndcdbOverlay);
+		}
 	}
 }
 

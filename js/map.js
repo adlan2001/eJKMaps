@@ -6,14 +6,25 @@
 // OpenStreetMap Standard Basemap
 var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	maxZoom: 22,
+	zIndex: 0,
 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright"> OpenStreetMap</a>'
 });
 
 // Google Maps Satellite Basemap
 var gmaps = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
 	maxZoom: 22,
+	zIndex: 0,
 	subdomains:["mt0","mt1","mt2","mt3"],
 	attribution: '&copy; <a href="https://www.google.com/maps/"> Google Maps</a>'
+});
+
+// Lot NDCDB Overlay Layer (kept global for toggling)
+var ndcdbOverlay = L.tileLayer('../eJKMaps/data/xyztiles/{z}/{x}/{y}.png', {
+	minZoom: 16,
+	maxNativeZoom: 19,
+	maxZoom: 22,
+	zIndex: 10,
+	attribution: '&copy; <a href="https://www.jupem.gov.my/"> JUPEM</a>'
 });
 
 // Define Penang Island bounds used as the initial view
