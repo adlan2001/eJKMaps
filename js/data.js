@@ -7,7 +7,7 @@ let rawData = null; // Store data globally for other modules
 
 async function loadGeoJsonAndInit() {
     try {
-        const resp = await fetch('data/boonsiew.geojson');
+        const resp = await fetch('data/boonsiew1.geojson');
         if (!resp.ok) throw new Error(`HTTP ${resp.status} ${resp.statusText}`);
         const data = await resp.json();
         rawData = data;

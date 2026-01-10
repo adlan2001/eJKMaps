@@ -80,6 +80,7 @@ function updateZoomClass() {
 map.on('zoomend', updateZoomClass);
 updateZoomClass();
 
+// 
 L.easyPrint({
 		title: 'Print map',
 		position: 'topleft',

@@ -2,7 +2,7 @@
 // Basemap options: simple array so it's easy to add more
 const basemapOpt = [
 	{ label: 'OpenStreetMap', value: 'osm' },
-	{ label: 'Google Satellite', value: 'gmaps' }
+	{ label: 'Google Hybrid', value: 'gmaps' }
 ];
 
 /**
